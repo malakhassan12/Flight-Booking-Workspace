@@ -1,0 +1,198 @@
+# services:
+#   postgres:
+#     image: postgres:17
+#     container_name: postgres-db
+#     restart: unless-stopped
+
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: 123456
+#       POSTGRES_DB: user_db
+
+#     ports:
+#       - "5432:5432"
+
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+
+#   user-service:
+#     build:
+#       context: .
+#       dockerfile: apps/user-service/Dockerfile
+
+#     container_name: user-service
+
+#     depends_on:
+#       - postgres
+
+#     ports:
+#       - "3001:3001"
+
+#     environment:
+#       PORT: 3001
+#       DB_HOST: postgres
+#       DB_PORT: 5432
+#       DB_USERNAME: postgres
+#       DB_PASSWORD: 123456
+#       DB_NAME: user_db
+#       DATABASE_URL: postgresql://postgres:123456@postgres:5432/user_db
+
+#   auth-service:
+#     build:
+#       context: .
+#       dockerfile: apps/auth-service/Dockerfile
+
+#     container_name: auth-service
+
+#     depends_on:
+#       - user-service
+
+#     ports:
+#       - "3002:3002"
+
+#     environment:
+#       PORT: 3002
+
+
+#   adminer:
+#     image: adminer
+#     container_name: adminer
+#     restart: unless-stopped
+
+#     depends_on:
+#       - postgres
+
+#     ports:
+#       - "8080:8080"
+
+# volumes:
+#   postgres_data:
+
+
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: flight_booking
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - backend
+
+  #########################################################
+
+  user-service:
+    build:
+      context: .
+      dockerfile: apps/user-service/Dockerfile
+
+    container_name: user-service
+
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    env_file:
+      - apps/user-service/.env
+
+    expose:
+      - "3001"
+
+    networks:
+      - backend
+
+  #########################################################
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+
+    container_name: auth-service
+
+    restart: unless-stopped
+
+    depends_on:
+      - user-service
+
+    env_file:
+      - apps/auth-service/.env
+
+    expose:
+      - "3002"
+
+    networks:
+      - backend
+
+
+
+  #########################################################
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+
+    container_name: api-gateway
+
+    restart: unless-stopped
+
+    depends_on:
+      - auth-service
+      - user-service
+      
+
+    env_file:
+      - apps/api-gateway/.env
+
+    ports:
+      - "3000:3000"
+
+    networks:
+      - backend
+
+  #########################################################
+
+  adminer:
+    image: adminer
+
+    container_name: adminer
+
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    ports:
+      - "8080:8080"
+
+    networks:
+      - backend
+
+#########################################################
+
+volumes:
+  postgres_data:
+
+#########################################################
+
+networks:
+  backend:
+    driver: bridge

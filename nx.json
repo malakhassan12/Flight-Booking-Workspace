@@ -3,10 +3,7 @@
   "defaultBase": "master",
   "analytics": true,
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/.eslintrc.json",
@@ -57,7 +54,28 @@
         "targetName": "test"
       },
       "exclude": [
-        "apps/Flight-Booking-Workspace-e2e/**/*"
+        "apps/Flight-Booking-Workspace-e2e/**/*",
+        "api-gateway-e2e/**/*",
+        "apps/auth-service-e2e/**/*",
+        "apps/user-service-e2e/**/*",
+        "apps/flight-service-e2e/**/*",
+        "apps/booking-service-e2e/**/*",
+        "apps/payment-service-e2e/**/*",
+        "apps/ticket-service-e2e/**/*",
+        "apps/check-in-service-e2e/**/*",
+        "apps/seat-service-e2e/**/*",
+        "apps/search-service-e2e/**/*",
+        "apps/pricing-service-e2e/**/*",
+        "apps/baggage-service-e2e/**/*",
+        "apps/notification-service-e2e/**/*",
+        "apps/loyalty-service-e2e/**/*",
+        "apps/promotion-service-e2e/**/*",
+        "apps/review-service-e2e/**/*",
+        "apps/audit-service-e2e/**/*",
+        "apps/analytics-service-e2e/**/*",
+        "apps/scheduler-service-e2e/**/*",
+        "apps/file-service-e2e/**/*",
+        "apps/user-service-e2e/**/*"
       ]
     },
     {
@@ -74,9 +92,7 @@
   ],
   "targetDefaults": {
     "test": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     }
   }
 }

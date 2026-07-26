@@ -1,0 +1,7 @@
+1 - Handle Docker with Dbs and Nginx with docker files
+
+2 - Make User Service which Mange the user CURD
+
+3 - Make Auth Service which it the root for all things
+
+4 - Make the API gateway

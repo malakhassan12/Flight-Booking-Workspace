@@ -4,10 +4,73 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/Flight-Booking-Workspace-e2e"
+      "path": "./libs/common"
     },
     {
-      "path": "./apps/Flight-Booking-Workspace"
+      "path": "./apps/auth-service"
+    },
+    {
+      "path": "./apps/flight-service"
+    },
+    {
+      "path": "./apps/booking-service"
+    },
+    {
+      "path": "./apps/payment-service"
+    },
+    {
+      "path": "./apps/ticket-service"
+    },
+    {
+      "path": "./apps/check-in-service"
+    },
+    {
+      "path": "./apps/seat-service"
+    },
+    {
+      "path": "./apps/search-service"
+    },
+    {
+      "path": "./apps/pricing-service"
+    },
+    {
+      "path": "./apps/baggage-service"
+    },
+    {
+      "path": "./apps/notification-service"
+    },
+    {
+      "path": "./apps/loyalty-service"
+    },
+    {
+      "path": "./apps/promotion-service"
+    },
+    {
+      "path": "./apps/review-service"
+    },
+    {
+      "path": "./apps/audit-service"
+    },
+    {
+      "path": "./apps/analytics-service"
+    },
+    {
+      "path": "./apps/scheduler-service"
+    },
+    {
+      "path": "./apps/file-service"
+    },
+    {
+      "path": "./apps/api-gateway"
+    },
+    {
+      "path": "./apps/user-service"
+    },
+    {
+      "path": "./libs/security"
+    },
+    {
+      "path": "./libs/core"
     }
   ]
 }

@@ -1,0 +1,40 @@
+FROM node:22-alpine
+
+# خطوة أساسية لتجميع أي مكتبات أصلية زي bcrypt وموجودة في الـ Alpine
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# 1. انسخ ملفات التثبيت وإعدادات الـ Workspace الأساسية
+COPY package.json package-lock.json tsconfig*.json nx.json ./
+
+# 2. خطوة جوهرية: انسخ مكاتب الـ libs كاملة أولاً عشان الـ npm يربطها بالـ Workspaces
+COPY libs/ ./libs/
+
+# 3. دلوقتي ثبت الـ Packages (الـ npm هيعمل Symlinks للـ common و core و security بنجاح)
+RUN npm ci
+
+# 4. انسخ باقي مراجع الـ Workspace والـ Apps
+COPY . .
+
+# 5. ابني الـ user-service (الآن Webpack هيشوف المكاتب فوراً)
+RUN ls -R libs
+
+RUN cat libs/common/package.json
+
+RUN cat libs/core/package.json
+
+RUN cat libs/security/package.json
+
+RUN npm ls bcrypt
+
+RUN npx nx show projects
+
+RUN npx prisma generate --schema=apps/user-service/prisma/schema.prisma
+
+RUN npx nx build user-service
+
+
+EXPOSE 3001
+CMD ["node", "apps/user-service/dist/main.js"]
+
