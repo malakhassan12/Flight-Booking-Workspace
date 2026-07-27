@@ -1,26 +1,9 @@
 import { Module } from '@nestjs/common';
-import { APIGatewayController } from './api-gateway.controller';
-import { APIGatewayService } from './api-gateway.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { APP_GUARD } from '@nestjs/core';
-import {
-  AuthGuard,
-  RolesGuard,
-  SecurityModule,
-} from '@flight-booking-workspace/security';
-import { CommonModule } from '@flight-booking-workspace/common';
-import { CoreModule } from '@flight-booking-workspace/core';
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
-import { ClientGatewayModule } from './clientGateway.module';
 
 @Module({
   imports: [
-    SecurityModule,
-    CoreModule,
-    CommonModule,
-
     ClientsModule.registerAsync([
       {
         imports: [ConfigModule],
@@ -62,23 +45,7 @@ import { ClientGatewayModule } from './clientGateway.module';
         inject: [ConfigService],
       },
     ]),
-    ClientGatewayModule,
-
-    UserModule,
-
-    AuthModule,
   ],
-  controllers: [APIGatewayController],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-    APIGatewayService,
-  ],
+  exports: [ClientsModule], 
 })
-export class APIGatewayModule {}
+export class ClientGatewayModule {}

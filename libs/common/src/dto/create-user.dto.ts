@@ -12,8 +12,9 @@ import {
   Length,
 } from 'class-validator';
 
-import { Gender, Role } from '@prisma/client';
 import { Type } from 'class-transformer';
+import { Role } from '../types/enum/role.enum';
+import { Gender } from '../types/enum/gender.enum';
 
 export class CreateUserDto {
   @IsEmail()
@@ -26,7 +27,7 @@ export class CreateUserDto {
   password!: string;
 
   @IsEnum(Role)
-  role: Role = Role.PASSENGER;
+  role!: Role ;
 
   // Age
   @Type(() => Number)

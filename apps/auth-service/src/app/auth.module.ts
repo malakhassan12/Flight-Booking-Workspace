@@ -14,13 +14,20 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       {
         imports: [ConfigModule],
         name: 'USER_SERVICE',
-        useFactory: async (configService: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
+        useFactory: async (configService: ConfigService) => {
+          console.log({
             host: configService.get('USER_SERVICE_HOST'),
             port: configService.get('USER_SERVICE_PORT'),
-          },
-        }),
+          });
+
+          return {
+            transport: Transport.TCP,
+            options: {
+              host: configService.get('USER_SERVICE_HOST'),
+              port: Number(configService.get('USER_SERVICE_PORT')),
+            },
+          };
+        },
         inject: [ConfigService],
       },
     ]),

@@ -79,6 +79,8 @@ export class TokenService {
         },
       });
     });
+
+    return true;
   }
 
   async deleteRefreshToken(data: DeleteRefreshToken) {

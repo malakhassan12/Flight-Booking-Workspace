@@ -1,15 +1,12 @@
-import {
-  ConflictException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { Role, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { UpdateUserDto  , DataResponse} from '@flight-booking-workspace/common';
+import {
+  UpdateUserDto,
+  DataResponse,
+  RpcHttpException,
+} from '@flight-booking-workspace/common';
 import type { UserPayload } from '@flight-booking-workspace/common';
 import { LoginDto, SignUpDto } from '@flight-booking-workspace/security';
 
@@ -36,13 +33,13 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new RpcHttpException(404, 'User not found');
     }
 
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
-      throw new UnauthorizedException('Current password is incorrect');
+      throw new RpcHttpException(401, 'Current password is incorrect');
     }
 
     return true;
@@ -71,13 +68,13 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new RpcHttpException(404, 'User not found');
     }
 
     const match = await bcrypt.compare(data.password, user.password);
 
     if (!match) {
-      throw new UnauthorizedException('Current password is incorrect');
+      throw new RpcHttpException(401, 'Current password is incorrect');
     }
 
     return user;
@@ -85,13 +82,13 @@ export class UserService {
 
   async create(data: SignUpDto): Promise<DataResponse<User>> {
     if (await this.checkEmail(data.email)) {
-      throw new ConflictException('Email already exists');
+      throw new RpcHttpException(409, 'Email already exists');
     }
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     if (!Object.values(Role).includes(data.role as Role)) {
-      throw new HttpException('Invalid role', HttpStatus.BAD_REQUEST);
+      throw new RpcHttpException(400, 'Invalid role');
     }
 
     await this.prisma.user.create({
@@ -101,7 +98,7 @@ export class UserService {
       },
     });
 
-    return new DataResponse('User created successfully', HttpStatus.OK);
+    return new DataResponse('User created successfully', 200);
   }
 
   async update(updateUserDto: UpdateUserDto, user: UserPayload) {
@@ -114,11 +111,11 @@ export class UserService {
     });
 
     if (!userExist) {
-      throw new NotFoundException('User not found');
+      throw new RpcHttpException(404, 'User not found');
     }
 
-    if (updateUserDto.role) {
-      throw new ConflictException('Not Allowed to update your role');
+    if (updateUserDto?.role) {
+      throw new RpcHttpException(409, 'Not Allowed to update your role');
     }
 
     if (updateUserDto.email) {
@@ -129,7 +126,7 @@ export class UserService {
       });
 
       if (existingUser && existingUser.id !== id) {
-        throw new ConflictException('Email already exists');
+        throw new RpcHttpException(409, 'Email already exists');
       }
     }
 
@@ -147,7 +144,7 @@ export class UserService {
       data: updateUserDto,
     });
 
-    return new DataResponse('User updated successfully', HttpStatus.OK);
+    return new DataResponse('User updated successfully', 200);
   }
 
   async findAll(page: number, limit: number) {
@@ -160,11 +157,12 @@ export class UserService {
           role: Role.PASSENGER,
         },
         select: {
+          id : true,
           name: true,
           email: true,
           gender: true,
           age: true,
-          phoneNumber: true,
+          phone: true,
           address: true,
         },
       }),
@@ -183,7 +181,7 @@ export class UserService {
         totalItems: number;
         totalPages: number;
       };
-    }>('Get users successfully', HttpStatus.OK, {
+    }>('Get users successfully', 200, {
       users,
       pagination: {
         page,
@@ -205,21 +203,18 @@ export class UserService {
         email: true,
         gender: true,
         age: true,
-        phoneNumber: true,
+        phone: true,
         address: true,
       },
     });
 
     if (!user) {
-      throw new HttpException(
-        { success: false, message: 'User not found' },
-        HttpStatus.NOT_FOUND,
-      );
+      throw new RpcHttpException(404, 'User not found');
     }
 
     return new DataResponse<Partial<User>>(
       'Selected User successfully',
-      HttpStatus.OK,
+      200,
       user,
     );
   }
@@ -233,10 +228,7 @@ export class UserService {
     });
 
     if (!userExist) {
-      throw new HttpException(
-        { success: false, message: 'User not found' },
-        HttpStatus.NOT_FOUND,
-      );
+      throw new RpcHttpException(404, 'User not found');
     }
 
     await this.prisma.user.delete({
@@ -245,6 +237,6 @@ export class UserService {
       },
     });
 
-    return new DataResponse('Deleted User successfully', HttpStatus.OK);
+    return new DataResponse('Deleted User successfully', 200);
   }
 }

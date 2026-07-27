@@ -34,6 +34,6 @@ RUN npx nx show projects
 RUN npx nx build api-gateway
 
 
-EXPOSE 3001
-CMD ["node", "apps/user-service/dist/main.js"]
+EXPOSE 3000
+CMD ["node", "apps/api-gateway/dist/main.js"]
 

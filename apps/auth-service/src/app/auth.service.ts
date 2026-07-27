@@ -1,11 +1,6 @@
-import {
-  HttpStatus,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, lastValueFrom, throwError } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -13,6 +8,7 @@ import {
   DataResponse,
   Role,
   UserPayload,
+  RpcHttpException,
 } from '@flight-booking-workspace/common';
 import {
   LoginDto,
@@ -30,7 +26,23 @@ export class AuthService {
   ) {}
 
   async signUp(data: SignUpDto) {
-    return this.userClient.send({ cmd: 'create-user' }, data);
+    try {
+      return await lastValueFrom(
+        this.userClient.send({ cmd: 'create-user' }, data).pipe(
+          catchError((err) => {
+            console.log('Sign-up');
+            console.dir(err, { depth: null });
+
+            return throwError(() => err);
+          }),
+        ),
+      );
+    } catch (e: any) {
+      throw new RpcHttpException(
+        e?.statusCode ?? 500,
+        e?.message ?? 'Internal server error',
+      );
+    }
   }
 
   private async persistRefreshToken(
@@ -38,93 +50,135 @@ export class AuthService {
     refreshToken: string,
     type: 'save' | 'update',
   ) {
-    const hashed = await bcrypt.hash(refreshToken, 10);
+    try {
+      const hashed = await bcrypt.hash(refreshToken, 10);
 
-    const expiresAt = new Date();
+      const expiresAt = new Date();
 
-    expiresAt.setDate(expiresAt.getDate() + 30);
+      expiresAt.setDate(expiresAt.getDate() + 30);
 
-    await lastValueFrom(
-      this.userClient.send(
-        { cmd: `${type}-refresh-token` },
-        type === 'update'
-          ? {
-              userId: userId,
-              refreshTokenHash: hashed,
-              expiresAt,
-              refreshToken,
-            }
-          : {
-              userId,
-              refreshTokenHash: hashed,
-              expiresAt,
-            },
-      ),
-    );
+      await lastValueFrom(
+        this.userClient
+          .send(
+            { cmd: `${type}-refresh-token` },
+            type === 'update'
+              ? {
+                  userId: userId,
+                  refreshTokenHash: hashed,
+                  expiresAt,
+                  refreshToken,
+                }
+              : {
+                  userId,
+                  refreshTokenHash: hashed,
+                  expiresAt,
+                },
+          )
+          .pipe(
+            catchError((err) => {
+              return throwError(() => err);
+            }),
+          ),
+      );
+    } catch (e: any) {
+      throw new RpcHttpException(
+        e?.statusCode ?? 500,
+        e?.message ?? 'Internal server error',
+      );
+    }
   }
-
   async login(data: LoginDto) {
-    const user = await lastValueFrom(
-      this.userClient.send({ cmd: 'validate-user' }, data),
-    );
+    try {
+      const user = await lastValueFrom(
+        this.userClient.send({ cmd: 'validate-user' }, data).pipe(
+          catchError((err) => {
+            console.log('Validate auth-service');
+            console.dir(err, { depth: null });
 
-    const genToken = await this.generateTokens(user);
+            return throwError(() => err);
+          }),
+        ),
+      );
 
-    await this.persistRefreshToken(user.id, genToken.refreshToken, 'save');
+      console.log('USER =>', user);
 
-    return {
-      data: {
-        refreshToken: genToken.refreshToken,
-        accessToken: genToken.accessToken,
-      },
-    };
+      const genToken = await this.generateTokens(user);
+
+      await this.persistRefreshToken(user.id, genToken.refreshToken, 'save');
+
+      return {
+        data: {
+          refreshToken: genToken.refreshToken,
+          accessToken: genToken.accessToken,
+        },
+      };
+    } catch (e: any) {
+      throw new RpcHttpException(
+        e?.statusCode ?? 500,
+        e?.message ?? 'Internal server error',
+      );
+    }
   }
 
   async resetPassword(data: ResetPasswordDto, user: UserPayload) {
-    await lastValueFrom(
-      this.userClient.send(
-        { cmd: 'check-password' },
-        {
-          id: user.id,
-          password: data.oldPassword,
-        },
-      ),
-    );
+    try {
+      await lastValueFrom(
+        this.userClient.send(
+          { cmd: 'check-password' },
+          {
+            id: user.id,
+            password: data.oldPassword,
+          },
+        ),
+      );
 
-    await lastValueFrom(
-      this.userClient.send(
-        { cmd: 'reset-password' },
-        {
-          id: user.id,
-          password: data.newPassword,
-        },
-      ),
-    );
+      await lastValueFrom(
+        this.userClient.send(
+          { cmd: 'reset-password' },
+          {
+            id: user.id,
+            password: data.newPassword,
+          },
+        ),
+      );
 
-    return new DataResponse('Reset Password Successfully', HttpStatus.OK);
+      return new DataResponse('Reset Password Successfully', HttpStatus.OK);
+    } catch (e: any) {
+      throw new RpcHttpException(
+        e?.statusCode ?? 500,
+        e?.message ?? 'Internal server error',
+      );
+    }
   }
 
   async generateTokens(user: { id: string; email: string; role: Role }) {
-    const payload = {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    };
+    try {
+      const payload = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      };
 
-    const accessToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-      expiresIn: '1d',
-    });
+      const accessToken = await this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        expiresIn: '1d',
+      });
 
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: '30d',
-    });
+      const refreshToken = await this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: '30d',
+      });
 
-    return {
-      accessToken,
-      refreshToken,
-    };
+      return {
+        accessToken,
+        refreshToken,
+      };
+    } catch (e: any) {
+      throw new RpcHttpException(
+        e?.statusCode ?? 500,
+        e?.message ?? 'Internal server error',
+      );
+    }
   }
 
   async refreshToken(refreshToken: string) {
@@ -133,13 +187,22 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
       const user = await firstValueFrom(
-        this.userClient.send(
-          { cmd: 'verify-refresh-token' },
-          {
-            userId: payload.id,
-            refreshToken,
-          },
-        ),
+        this.userClient
+          .send(
+            { cmd: 'verify-refresh-token' },
+            {
+              userId: payload.id,
+              refreshToken,
+            },
+          )
+          .pipe(
+            catchError((err) => {
+              console.log('Refresh auth-service');
+              console.dir(err, { depth: null });
+
+              return throwError(() => err);
+            }),
+          ),
       );
 
       const genToken = await this.generateTokens(user);
@@ -152,20 +215,39 @@ export class AuthService {
           accessToken: genToken.accessToken,
         },
       };
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
+    } catch (e: any) {
+      throw new RpcHttpException(
+        e?.statusCode ?? 500,
+        e?.message ?? 'Internal server error',
+      );
     }
   }
 
   async logout(user: UserPayload, refreshToken: string) {
-    await firstValueFrom(
-      this.userClient.send(
-        { cmd: 'delete-refresh-token' },
-        {
-          userId: user.id,
-          refreshToken,
-        },
-      ),
-    );
+    try {
+      return await firstValueFrom(
+        this.userClient
+          .send(
+            { cmd: 'delete-refresh-token' },
+            {
+              userId: user.id,
+              refreshToken,
+            },
+          )
+          .pipe(
+            catchError((err) => {
+              console.log('logout auth-service');
+              console.dir(err, { depth: null });
+
+              return throwError(() => err);
+            }),
+          ),
+      );
+    } catch (e: any) {
+      throw new RpcHttpException(
+        e?.statusCode ?? 500,
+        e?.message ?? 'Internal server error',
+      );
+    }
   }
 }

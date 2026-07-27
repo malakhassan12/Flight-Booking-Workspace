@@ -4,12 +4,12 @@
  */
 
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/api-gateway.module';
+import { APIGatewayModule } from './app/api-gateway.module';
 import { bootstrapHttp } from '@flight-booking-workspace/core';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(APIGatewayModule);
   const configService = app.get(ConfigService);
 
   await bootstrapHttp(app, {

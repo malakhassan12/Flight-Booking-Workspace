@@ -79,7 +79,11 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: flight_booking
+      POSTGRES_DB: user_db
+    
+    ports:
+      - "5432:5432"
+
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -156,7 +160,7 @@ services:
     depends_on:
       - auth-service
       - user-service
-      
+
 
     env_file:
       - apps/api-gateway/.env

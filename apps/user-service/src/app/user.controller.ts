@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { UserService } from './user.service';
-import { LoginDto } from '@flight-booking-workspace/security';
+import { LoginDto, SignUpDto } from '@flight-booking-workspace/security';
 import type { UserPayload } from '@flight-booking-workspace/common';
 import { UpdateUserDto } from '@flight-booking-workspace/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
@@ -8,6 +8,11 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @MessagePattern({ cmd: 'create-user' })
+  createUser(@Payload() data: SignUpDto) {
+    return this.userService.create(data);
+  }
 
   @MessagePattern({ cmd: 'update-user' })
   update(@Payload() data: { user: UserPayload; updateUserDto: UpdateUserDto }) {
@@ -30,7 +35,7 @@ export class UserController {
   }
 
   @MessagePattern({ cmd: 'validate-user' })
-  validateUser(data: LoginDto) {
+  validateUser(@Payload() data: LoginDto) {
     return this.userService.validateUser(data);
   }
 
