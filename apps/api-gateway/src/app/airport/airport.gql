@@ -1,0 +1,107 @@
+type Airport {
+  id: ID!
+
+  name: String
+
+  iataCode: String
+
+  icaoCode: String
+
+  city: City
+
+  timezone: String
+
+  latitude: Float
+
+  longitude: Float
+}
+
+enum AirportErrorCode {
+  AIRPORT_NOT_FOUND
+  CITY_NOT_FOUND
+  AIRPORT_ALREADY_EXISTS
+  IATA_CODE_ALREADY_EXISTS
+  ICAO_CODE_ALREADY_EXISTS
+  INVALID_PAGINATION
+  AIRPORT_DELETE_FAILED
+}
+
+type AirportError {
+  message: String!
+  code: AirportErrorCode!
+}
+
+
+type AirportPagination implements Pagination {
+  airports: [Airport!]!
+
+  totalItems: Int!
+
+  page: Int!
+
+  limit: Int!
+
+  totalPages: Int!
+}
+
+extend type Query {
+  airports(page: Int = 1, limit: Int = 10): AirportPaginationResponse!
+
+  airport(id: ID!): AirportResponse
+}
+
+input CreateAirportInput {
+  name: String!
+
+  iataCode: String!
+
+  icaoCode: String!
+
+  cityId: ID!
+
+  timezone: String!
+
+  latitude: Float!
+
+  longitude: Float!
+}
+
+input UpdateAirportInput {
+  id: ID!
+
+  name: String
+
+  iataCode: String
+
+  icaoCode: String
+
+  cityId: ID
+
+  timezone: String
+
+  latitude: Float
+
+  longitude: Float
+}
+
+type AirportResponse implements Response {
+  message: String!
+  status: Int!
+  data: Airport
+  errors: [AirportError!]
+}
+
+type AirportPaginationResponse implements Response {
+  message: String!
+  status: Int!
+  data: AirportPagination
+  errors: [AirportError!]
+}
+
+extend type Mutation {
+  createAirport(input: CreateAirportInput!): AirportResponse!
+
+  updateAirport(input: UpdateAirportInput!): AirportResponse!
+
+  removeAirport(id: ID!): AirportResponse!
+}

@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorator/public.decorator';
 import { Reflector } from '@nestjs/core';
+import { getRequest } from '../utils/getRequest';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -28,7 +29,8 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = await getRequest(context);
+
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException();
@@ -41,11 +43,9 @@ export class AuthGuard implements CanActivate {
       // so that we can access it in our route handlers
       request['user'] = payload;
     } catch (err) {
-      console.log("From Guard",err);
-      throw new HttpException(
-        { success: false, message: err },
-        HttpStatus.CONFLICT,
-      );
+      console.log('From Guard', err);
+
+      throw new UnauthorizedException('Invalid or expired token');
     }
     return true;
   }
@@ -53,8 +53,8 @@ export class AuthGuard implements CanActivate {
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     console.log(request.headers);
-    console.log("type" ,type);
-    console.log("Token",token);
+    console.log('type', type);
+    console.log('Token', token);
     return type === 'Bearer' ? token : undefined;
   }
 }

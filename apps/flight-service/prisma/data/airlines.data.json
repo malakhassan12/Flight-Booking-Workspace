@@ -1,0 +1,81 @@
+[
+  { "name": "EgyptAir", "code": "MS", "country": "EG" },
+
+  { "name": "Emirates", "code": "EK", "country": "AE" },
+  { "name": "Etihad Airways", "code": "EY", "country": "AE" },
+  { "name": "Air Arabia", "code": "G9", "country": "AE" },
+  { "name": "Flydubai", "code": "FZ", "country": "AE" },
+
+  { "name": "Qatar Airways", "code": "QR", "country": "QA" },
+
+  { "name": "Saudia", "code": "SV", "country": "SA" },
+  { "name": "Flynas", "code": "XY", "country": "SA" },
+  { "name": "Flyadeal", "code": "F3", "country": "SA" },
+
+  { "name": "Kuwait Airways", "code": "KU", "country": "KW" },
+  { "name": "Jazeera Airways", "code": "J9", "country": "KW" },
+
+  { "name": "Gulf Air", "code": "GF", "country": "BH" },
+
+  { "name": "Oman Air", "code": "WY", "country": "OM" },
+
+  { "name": "Royal Jordanian", "code": "RJ", "country": "JO" },
+
+  { "name": "Turkish Airlines", "code": "TK", "country": "TR" },
+  { "name": "Pegasus Airlines", "code": "PC", "country": "TR" },
+
+  { "name": "Lufthansa", "code": "LH", "country": "DE" },
+
+  { "name": "Air France", "code": "AF", "country": "FR" },
+
+  { "name": "KLM", "code": "KL", "country": "NL" },
+
+  { "name": "British Airways", "code": "BA", "country": "GB" },
+
+  { "name": "Iberia", "code": "IB", "country": "ES" },
+
+  { "name": "ITA Airways", "code": "AZ", "country": "IT" },
+
+  { "name": "SWISS", "code": "LX", "country": "CH" },
+
+  { "name": "Austrian Airlines", "code": "OS", "country": "AT" },
+
+  { "name": "Brussels Airlines", "code": "SN", "country": "BE" },
+
+  { "name": "Ryanair", "code": "FR", "country": "IE" },
+
+  { "name": "Wizz Air", "code": "W6", "country": "HU" },
+
+  { "name": "Delta Air Lines", "code": "DL", "country": "US" },
+  { "name": "American Airlines", "code": "AA", "country": "US" },
+  { "name": "United Airlines", "code": "UA", "country": "US" },
+  { "name": "Southwest Airlines", "code": "WN", "country": "US" },
+  { "name": "JetBlue", "code": "B6", "country": "US" },
+  { "name": "Alaska Airlines", "code": "AS", "country": "US" },
+
+  { "name": "Air Canada", "code": "AC", "country": "CA" },
+
+  { "name": "Qantas", "code": "QF", "country": "AU" },
+
+  { "name": "Air New Zealand", "code": "NZ", "country": "NZ" },
+
+  { "name": "Singapore Airlines", "code": "SQ", "country": "SG" },
+
+  { "name": "Malaysia Airlines", "code": "MH", "country": "MY" },
+  { "name": "AirAsia", "code": "AK", "country": "MY" },
+
+  { "name": "Thai Airways", "code": "TG", "country": "TH" },
+
+  { "name": "Japan Airlines", "code": "JL", "country": "JP" },
+  { "name": "All Nippon Airways", "code": "NH", "country": "JP" },
+
+  { "name": "Korean Air", "code": "KE", "country": "KR" },
+  { "name": "Asiana Airlines", "code": "OZ", "country": "KR" },
+
+  { "name": "Air China", "code": "CA", "country": "CN" },
+  { "name": "China Eastern", "code": "MU", "country": "CN" },
+  { "name": "China Southern", "code": "CZ", "country": "CN" },
+
+  { "name": "Air India", "code": "AI", "country": "IN" },
+  { "name": "IndiGo", "code": "6E", "country": "IN" }
+]

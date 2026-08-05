@@ -1,0 +1,60 @@
+type AircraftModel {
+  id: ID!
+
+  name: String!
+
+  manufacturer: Manufacturer!
+
+  aircraftList: [Aircraft!]!
+}
+
+type AircraftModelPagination implements Pagination {
+  AircraftModels: [AircraftModel!]!
+
+  totalItems: Int!
+
+  page: Int!
+
+  limit: Int!
+
+  totalPages: Int!
+}
+
+type AircraftModelPaginationResponse implements Response {
+  message: String!
+  status: Int!
+  data: AircraftModelPagination
+}
+
+type AircraftModelResponse implements Response {
+  message: String!
+  status: Int!
+  data: AircraftModel
+}
+
+input CreateAircraftModelInput {
+  name: String!
+
+  manufacturerId: ID!
+}
+
+input UpdateAircraftModelInput {
+  id: ID!
+
+  name: String
+
+  manufacturerId: ID
+}
+
+extend type Query {
+  aircraftModels(page: Int = 1, limit: Int = 10): AircraftModelPaginationResponse!
+  aircraftModel(id: ID!): AircraftModelResponse
+}
+
+extend type Mutation {
+  createAircraftModel(input: CreateAircraftModelInput!): AircraftModelResponse!
+
+  updateAircraftModel(input: UpdateAircraftModelInput!): AircraftModelResponse!
+
+  removeAircraftModel(id: ID!): AircraftModelResponse!
+}

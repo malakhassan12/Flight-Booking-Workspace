@@ -1,0 +1,13 @@
+enum FlightStatus {
+  SCHEDULED
+  BOARDING
+  DELAYED
+  DEPARTED
+  ARRIVED
+  CANCELLED
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}

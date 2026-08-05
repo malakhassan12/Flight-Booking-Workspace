@@ -17,24 +17,18 @@ RUN npm ci
 # 4. انسخ باقي مراجع الـ Workspace والـ Apps
 COPY . .
 
-# 5. ابني الـ user-service (الآن Webpack هيشوف المكاتب فوراً)
-RUN ls -R libs
-
-RUN cat libs/common/package.json
-
-RUN cat libs/core/package.json
-
-RUN cat libs/security/package.json
-
-RUN npm ls bcrypt
-
-RUN npx nx show projects
 
 RUN npx prisma generate --schema=apps/user-service/prisma/schema.prisma
 
 RUN npx nx build user-service
 
 
+# EXPOSE 3001
+# CMD ["node", "apps/user-service/dist/main.js"]
+
+RUN chmod +x apps/user-service/start.sh
+
 EXPOSE 3001
-CMD ["node", "apps/user-service/dist/main.js"]
+
+CMD ["sh", "apps/user-service/start.sh"]
 

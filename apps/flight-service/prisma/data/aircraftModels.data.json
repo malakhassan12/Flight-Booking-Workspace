@@ -1,0 +1,27 @@
+[
+  { "manufacturer": "Airbus", "name": "A220-300" },
+  { "manufacturer": "Airbus", "name": "A319" },
+  { "manufacturer": "Airbus", "name": "A320" },
+  { "manufacturer": "Airbus", "name": "A320neo" },
+  { "manufacturer": "Airbus", "name": "A321" },
+  { "manufacturer": "Airbus", "name": "A321neo" },
+  { "manufacturer": "Airbus", "name": "A330-300" },
+  { "manufacturer": "Airbus", "name": "A350-900" },
+
+  { "manufacturer": "Boeing", "name": "737-700" },
+  { "manufacturer": "Boeing", "name": "737-800" },
+  { "manufacturer": "Boeing", "name": "737 MAX 8" },
+  { "manufacturer": "Boeing", "name": "747-8" },
+  { "manufacturer": "Boeing", "name": "767-300ER" },
+  { "manufacturer": "Boeing", "name": "777-300ER" },
+  { "manufacturer": "Boeing", "name": "787-8" },
+  { "manufacturer": "Boeing", "name": "787-9" },
+
+  { "manufacturer": "Embraer", "name": "E170" },
+  { "manufacturer": "Embraer", "name": "E175" },
+  { "manufacturer": "Embraer", "name": "E190" },
+  { "manufacturer": "Embraer", "name": "E195" },
+
+  { "manufacturer": "ATR", "name": "ATR 42-600" },
+  { "manufacturer": "ATR", "name": "ATR 72-600" }
+]

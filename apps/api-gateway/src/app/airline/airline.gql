@@ -1,0 +1,63 @@
+type Airline {
+  id: ID!
+  name: String
+  code: String
+  country: Country
+  flights: [Flight!]!
+}
+
+type AirlinePagination implements Pagination {
+  airlines: [Airline!]!
+
+  totalItems: Int!
+
+  page: Int!
+
+  limit: Int!
+
+  totalPages: Int!
+}
+
+type AirlinePaginationResponse implements Response {
+  message: String!
+  status: Int!
+  data: AirlinePagination
+}
+
+type AirlineResponse implements Response {
+  message: String!
+  status: Int!
+  data: Airline
+}
+
+extend type Query {
+  airlines(page: Int = 1, limit: Int = 10): AirlinePaginationResponse!
+
+  airline(id: ID!): AirlineResponse
+}
+
+input CreateAirlineInput {
+  name: String!
+
+  code: String!
+
+  countryId: ID!
+}
+
+input UpdateAirlineInput {
+  id: ID!
+
+  name: String
+
+  code: String
+
+  countryId: ID
+}
+
+extend type Mutation {
+  createAirline(input: CreateAirlineInput!): AirlineResponse!
+
+  updateAirline(input: UpdateAirlineInput!): AirlineResponse!
+
+  removeAirline(id: ID!): AirlineResponse!
+}

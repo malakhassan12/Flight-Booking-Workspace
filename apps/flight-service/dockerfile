@@ -1,0 +1,52 @@
+FROM node:22-alpine
+
+# خطوة أساسية لتجميع أي مكتبات أصلية زي bcrypt وموجودة في الـ Alpine
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# 1. انسخ ملفات التثبيت وإعدادات الـ Workspace الأساسية
+COPY package.json package-lock.json tsconfig*.json nx.json ./
+
+# 2. خطوة جوهرية: انسخ مكاتب الـ libs كاملة أولاً عشان الـ npm يربطها بالـ Workspaces
+COPY libs/ ./libs/
+
+# 3. دلوقتي ثبت الـ Packages (الـ npm هيعمل Symlinks للـ common و core و security بنجاح)
+RUN npm ci
+
+# 4. انسخ باقي مراجع الـ Workspace والـ Apps
+COPY . .
+
+COPY apps/flight-service/prisma ./apps/flight-service/prisma
+
+RUN npx prisma generate --schema=apps/flight-service/prisma/schema.prisma
+
+RUN echo "===== GENERATED PRISMA =====" \
+    && ls -la apps/flight-service/src \
+    && ls -la apps/flight-service/src/generated \
+    && ls -la apps/flight-service/src/generated/prisma
+
+RUN npx nx build flight-service
+
+
+RUN echo "===== FULL FILESYSTEM SEARCH =====" && \
+    find /app -name "main.js" -not -path "*/node_modules/*" 2>/dev/null; \
+    echo "===== dist DIRECTORIES =====" && \
+    find /app -maxdepth 6 -type d -iname "dist" -not -path "*/node_modules/*" 2>/dev/null; \
+    echo "===== apps/flight-service full tree =====" && \
+    find /app/apps/flight-service -not -path "*/node_modules/*" 2>/dev/null; \
+    echo "===== END DIAGNOSTICS ====="
+
+# EXPOSE 3003
+
+
+# CMD ["node", "apps/flight-service/dist/main.js"]
+
+
+RUN chmod +x apps/user-service/start.sh
+
+EXPOSE 3003
+
+CMD ["sh", "apps/flight-service/start.sh"]
+
+

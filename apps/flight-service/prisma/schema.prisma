@@ -1,0 +1,299 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+    moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// Country
+//    |
+//    |
+//  City
+//    |
+//    |
+//  Airport
+//    |
+//    |
+//  Flight  <---- Airline
+//    |
+//    |
+//  Aircraft
+//    |
+//    |
+//  AircraftModel
+//    |
+//    |
+//  Manufacturer
+
+
+/*
+
+Country
+      ↓
+City
+      ↓
+Airport
+
+Country
+      ↓
+Manufacturer
+      ↓
+AircraftModel
+
+Airline
+
+Aircraft
+
+Flight
+*/
+
+// Company
+
+model Country {
+  id              String   @id @default(uuid())
+
+  name            String
+  nativeName      String?
+
+  iso2            String   @unique
+  iso3            String   @unique
+  numericCode     String?  @unique
+
+  capital         String?
+
+  phoneCode       String?
+  currency        String?
+  currencyName    String?
+  currencySymbol  String?
+
+  language        String?
+  languageCode    String?
+
+  region          String?
+  subregion       String?
+
+  population      Int?
+  area            Float?
+  gini            Float?
+
+  latitude        Decimal?
+  longitude       Decimal?
+
+  timezone        String?
+
+  demonym         String?
+
+  flag            String?
+
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  cities          City[]
+  manufacturers   Manufacturer[]
+  airlines        Airline[]
+}
+
+model City {
+
+  id          String   @id @default(uuid())
+
+  name        String
+
+  countryId   String
+
+  isActive Boolean @default(true)
+
+  country      Country @relation(fields: [countryId], references: [id])
+
+  airports     Airport[]
+
+  createdAt    DateTime @default(now())
+
+  updatedAt    DateTime @updatedAt
+
+  @@unique([name, countryId])
+}
+
+model Airline {
+  id          String   @id @default(uuid())
+
+  name        String
+
+  code        String   @unique
+
+  countryId String
+
+  country Country @relation(fields: [countryId], references: [id])
+
+  createdAt   DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+
+  flights     Flight[]
+}
+
+model Airport {
+
+  id          String @id @default(uuid())
+
+  name        String
+
+  iataCode    String @unique
+
+  icaoCode    String @unique
+
+  cityId      String
+
+  city        City @relation(fields: [cityId], references: [id])
+
+  timezone    String
+
+  latitude    Decimal
+
+  longitude   Decimal
+
+  departures Flight[] @relation("OriginAirport")
+
+  arrivals Flight[] @relation("DestinationAirport")
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([iataCode])
+
+  @@index([icaoCode])
+}
+
+model Manufacturer {
+
+  id String @id @default(uuid())
+
+  name String @unique
+
+  countryId String?
+
+  country Country? @relation(fields:[countryId], references:[id])
+
+  aircraftList Aircraft[]
+
+  aircraftModels AircraftModel[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+model AircraftModel {
+
+  id String @id @default(uuid())
+
+  name String
+
+  manufacturerId String
+
+  manufacturer Manufacturer  @relation(fields:[manufacturerId], references:[id])
+
+  aircraftList Aircraft[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, manufacturerId])
+}
+
+model Aircraft {
+
+  id String @id @default(uuid())
+
+  manufacturerId String
+
+  manufacturer Manufacturer @relation(fields:[manufacturerId], references:[id])
+
+  modelId String
+
+  model AircraftModel  @relation(fields:[modelId], references:[id])
+
+  registrationNumber String @unique @db.VarChar(20)
+
+  seatCapacity Int
+
+  flights Flight[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+enum FlightStatus {
+
+  SCHEDULED
+
+  BOARDING
+
+  DELAYED
+
+  DEPARTED
+
+  ARRIVED
+
+  CANCELLED
+}
+
+model Flight {
+
+  id String @id @default(uuid())
+
+  flightNumber String
+
+  airlineId String
+
+  aircraftId String
+
+  originAirportId String
+
+  destinationAirportId String
+
+  departureTime DateTime
+
+  arrivalTime DateTime
+
+  status FlightStatus @default(SCHEDULED)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  airline Airline @relation(fields:[airlineId],references:[id])
+
+  aircraft Aircraft @relation(fields:[aircraftId],references:[id])
+
+  origin Airport @relation("OriginAirport",fields:[originAirportId],references:[id] , onDelete:Restrict )
+
+  destination Airport @relation("DestinationAirport", fields:[destinationAirportId], references:[id] , onDelete:Restrict)
+
+  @@unique([flightNumber, departureTime])
+
+  @@index([originAirportId])
+
+  @@index([destinationAirportId])
+
+  @@index([departureTime])
+
+  @@index([status])
+
+  @@index([airlineId])
+
+}

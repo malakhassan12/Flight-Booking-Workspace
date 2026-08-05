@@ -1,0 +1,6 @@
+interface Pagination {
+  page: Int!
+  limit: Int!
+  totalItems: Int!
+  totalPages: Int!
+}

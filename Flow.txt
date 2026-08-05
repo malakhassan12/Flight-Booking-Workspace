@@ -3,5 +3,5 @@
 2 - Make User Service which Mange the user CURD
 
 3 - Make Auth Service which it the root for all things
-
+docker compose run --rm --entrypoint sh flight-service
 4 - Make the API gateway

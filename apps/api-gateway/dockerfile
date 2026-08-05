@@ -35,5 +35,6 @@ RUN npx nx build api-gateway
 
 
 EXPOSE 3000
-CMD ["node", "apps/api-gateway/dist/main.js"]
+# CMD ["node", "apps/api-gateway/dist/main.js"]
 
+CMD ["node", "dist/apps/api-gateway/main.js"]

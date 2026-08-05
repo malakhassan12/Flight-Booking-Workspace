@@ -1,21 +1,40 @@
+import { bootstrapMicroservice } from '@flight-booking-workspace/core';
+import { ConfigService } from '@nestjs/config';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 /**
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
 
-import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/app.module';
+import { FlightModule } from './app/flight.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'api';
-  app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
-  Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
+  const context = await NestFactory.createApplicationContext(FlightModule);
+
+  const configService = context.get(ConfigService);
+  console.log('From Flight-service', configService.get<number>('PORT'));
+
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    FlightModule,
+    {
+      transport: Transport.KAFKA,
+      options: {
+        client: {
+          clientId: configService.get<string>('FLIGHT_CLIENT_ID') || '',
+
+          brokers: [configService.get<string>('KAFKA_BROKER') || ''],
+        },
+        consumer: {
+          groupId: configService.get<string>('FLIGHT_GROUP_ID') || '',
+        },
+      },
+    },
   );
+
+  bootstrapMicroservice(app);
+
+  await app.listen();
 }
 
 bootstrap();

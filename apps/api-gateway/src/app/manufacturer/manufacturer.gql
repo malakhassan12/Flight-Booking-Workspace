@@ -1,0 +1,65 @@
+type Manufacturer {
+  id: ID!
+
+  name: String!
+
+
+  country: Country!
+
+  aircraftList: [Aircraft!]!
+
+  aircraftModels: [AircraftModel!]!
+
+}
+
+type ManufacturerPagination implements Pagination {
+  manufacturers: [Manufacturer!]!
+
+  totalItems: Int!
+
+  page: Int!
+
+  limit: Int!
+
+  totalPages: Int!
+}
+
+type ManufacturerPaginationResponse implements Response {
+  message: String!
+  status: Int!
+  data: ManufacturerPagination
+}
+
+type ManufacturerResponse implements Response {
+  message: String!
+  status: Int!
+  data: Manufacturer
+}
+
+input CreateManufacturerInput {
+  name: String!
+
+  countryId: ID!
+}
+
+input UpdateManufacturerInput {
+  id: ID!
+
+  name: String
+
+  countryId: ID
+}
+
+extend type Query {
+  manufacturers(page: Int = 1, limit: Int = 10): ManufacturerPaginationResponse!
+
+  manufacturer(id: ID!): ManufacturerResponse
+}
+
+extend type Mutation {
+  createManufacturer(input: CreateManufacturerInput!): ManufacturerResponse!
+
+  updateManufacturer( input: UpdateManufacturerInput!): ManufacturerResponse!
+
+  removeManufacturer(id: ID!): ManufacturerResponse!
+}

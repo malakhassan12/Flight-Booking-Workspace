@@ -71,6 +71,9 @@
     },
     {
       "path": "./libs/core"
+    },
+    {
+      "path": "./libs/graphql-types"
     }
   ]
 }

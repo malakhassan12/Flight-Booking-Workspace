@@ -1,0 +1,103 @@
+type Flight {
+  id: ID!
+
+  flightNumber: String!
+
+  airline: Airline!
+
+  aircraft: Aircraft!
+
+  origin: Airport!
+
+  destination: Airport!
+
+  departureTime: DateTime!
+
+  arrivalTime: DateTime!
+
+  status: FlightStatus!
+}
+
+input CreateFlightInput {
+  flightNumber: String!
+
+  airlineId: ID!
+
+  aircraftId: ID!
+
+  originAirportId: ID!
+
+  destinationAirportId: ID!
+
+  departureTime: DateTime!
+
+  arrivalTime: DateTime!
+
+  status: FlightStatus!
+}
+
+input UpdateFlightInput {
+  id: ID!
+
+  flightNumber: String
+
+  airlineId: ID
+
+  aircraftId: ID
+
+  originAirportId: ID
+
+  destinationAirportId: ID
+
+  departureTime: DateTime
+
+  arrivalTime: DateTime
+
+  status: FlightStatus
+}
+
+input ChangeFlightStatusInput {
+  flightId: ID!
+
+  status: FlightStatus!
+}
+
+type FlightPagination implements Pagination {
+  flights: [Flight!]!
+
+  totalItems: Int!
+
+  page: Int!
+
+  limit: Int!
+
+  totalPages: Int!
+}
+
+type FlightPaginationResponse implements Response {
+  message: String!
+  status: Int!
+  data: FlightPagination
+}
+
+type FlightResponse implements Response {
+  message: String!
+  status: Int!
+  data: Flight
+}
+
+extend type Query {
+  flights(page: Int = 1, limit: Int = 10): FlightPaginationResponse!
+
+  flight(id: ID!): FlightResponse
+}
+
+extend type Mutation {
+  createFlight(input: CreateFlightInput!): FlightResponse!
+
+  updateFlight(input: UpdateFlightInput!): FlightResponse!
+
+  removeFlight(id: ID!): FlightResponse!
+
+  changeFlightStatus(input: ChangeFlightStatusInput!): FlightResponse
+}

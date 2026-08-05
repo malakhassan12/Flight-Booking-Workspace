@@ -1,0 +1,20 @@
+[
+  {
+    "registration": "SU-GCM",
+    "airline": "EgyptAir",
+    "model": "A320neo",
+    "seatCapacity": 180
+  },
+  {
+    "registration": "SU-GCX",
+    "airline": "EgyptAir",
+    "model": "737-800",
+    "seatCapacity": 166
+  },
+  {
+    "registration": "A6-EOT",
+    "airline": "Emirates",
+    "model": "777-300ER",
+    "seatCapacity": 396
+  }
+]

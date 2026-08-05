@@ -4,7 +4,10 @@
     "outDir": "dist",
     "types": ["node"],
     "rootDir": "src",
+    // "outDir": "../../dist/apps/flight-service",
+    // "tsBuildInfoFile": "../../dist/apps/flight-service/tsconfig.app.tsbuildinfo",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
+
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2021"
@@ -20,5 +23,46 @@
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs"
+  ],
+  "references": [
+    {
+      "path": "../../libs/security/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/core/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/common/tsconfig.lib.json"
+    }
   ]
 }
+// {
+//   "extends": "../../tsconfig.base.json",
+//   "compilerOptions": {
+//     "outDir": "./dist",
+//     "rootDir": "./src",
+//     "types": ["node"],
+//     "target": "es2021",
+
+//     "experimentalDecorators": true,
+//     "emitDecoratorMetadata": true,
+
+//     "declaration": true,
+//     "sourceMap": true,
+
+//     "tsBuildInfoFile": "./dist/tsconfig.app.tsbuildinfo"
+//   },
+//   "include": ["src/**/*.ts"],
+//   "exclude": ["dist", "node_modules", "src/**/*.spec.ts", "src/**/*.test.ts"],
+//   "references": [
+//     {
+//       "path": "../../libs/security/tsconfig.lib.json"
+//     },
+//     {
+//       "path": "../../libs/core/tsconfig.lib.json"
+//     },
+//     {
+//       "path": "../../libs/common/tsconfig.lib.json"
+//     }
+//   ]
+// }
