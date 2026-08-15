@@ -1,0 +1,25 @@
+FROM node:22-alpine
+
+# خطوة أساسية لتجميع أي مكتبات أصلية زي bcrypt وموجودة في الـ Alpine
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+COPY package.json package-lock.json tsconfig*.json nx.json ./
+
+COPY libs/ ./libs/
+
+RUN npm ci
+
+COPY . .
+
+
+RUN npx nx build seat-service
+
+
+EXPOSE 3004
+
+
+CMD ["node", "apps/seat-service/dist/main.js"]
+
+

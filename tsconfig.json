@@ -74,6 +74,15 @@
     },
     {
       "path": "./libs/graphql-types"
+    },
+    {
+      "path": "./libs/consul"
+    },
+    {
+      "path": "./libs/vault"
+    },
+    {
+      "path": "./libs/redis"
     }
   ]
 }

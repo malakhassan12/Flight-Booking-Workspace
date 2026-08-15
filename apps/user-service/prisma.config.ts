@@ -4,12 +4,22 @@
 import 'dotenv/config';
 import { defineConfig } from 'prisma/config';
 
+import { VaultService } from '@flight-booking-workspace/vault';
+
+
+const vaultService = new VaultService();
+
+const secrets =
+  await vaultService.getSecret('user-service');
+
+
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
   },
   datasource: {
-    url: process.env['DATABASE_URL'],
+    // url: process.env['DATABASE_URL'],
+    url : secrets.DATABASE_URL
   },
 });

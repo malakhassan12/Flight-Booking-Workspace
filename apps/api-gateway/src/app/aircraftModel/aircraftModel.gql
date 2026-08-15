@@ -3,13 +3,15 @@ type AircraftModel {
 
   name: String!
 
-  manufacturer: Manufacturer!
+  manufacturer: Manufacturer
 
   aircraftList: [Aircraft!]!
+
+  aircraftLayout : AircraftLayout
 }
 
 type AircraftModelPagination implements Pagination {
-  AircraftModels: [AircraftModel!]!
+  aircraftModels: [AircraftModel!]!
 
   totalItems: Int!
 

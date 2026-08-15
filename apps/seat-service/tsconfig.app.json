@@ -20,5 +20,25 @@
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs"
+  ],
+  "references": [
+    {
+      "path": "../../libs/redis/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/security/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vault/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/consul/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/core/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/common/tsconfig.lib.json"
+    }
   ]
 }

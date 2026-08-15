@@ -23,6 +23,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/consul/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/core/tsconfig.lib.json"
     },
     {

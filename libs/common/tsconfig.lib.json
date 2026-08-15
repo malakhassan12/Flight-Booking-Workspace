@@ -15,7 +15,7 @@
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "../../apps/seat-service/src/app/dto/create-flight-seats.dto.ts"],
   "references": [],
   "exclude": [
     "jest.config.ts",

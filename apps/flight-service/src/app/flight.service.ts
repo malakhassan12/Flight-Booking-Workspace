@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientKafka } from '@nestjs/microservices';
 import { PrismaService } from './prisma/prisma.service';
 import { Flight, FlightStatus } from '../generated/prisma/client';
 import {
@@ -11,7 +12,11 @@ import {
 
 @Injectable()
 export class FlightService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject('KAFKA_CLIENT')
+    private readonly kafkaClient: ClientKafka,
+  ) {}
 
   async findAirlineByFlight(flightId: string) {
     const flight = await this.prisma.flight.findUnique({
@@ -154,14 +159,27 @@ export class FlightService {
       throw new RpcHttpException(409, 'Flight already exists');
     }
 
-    await this.prisma.flight.create({
+    const flight = await this.prisma.flight.create({
       data: {
         ...createFlightDto,
         flightNumber,
         departureTime,
         arrivalTime,
       },
+      include: {
+        aircraft: true,
+      },
     });
+
+    const eventData = {
+      flightId: flight.id,
+      aircraftModelId: flight.aircraft.modelId,
+    };
+
+    console.log('========== FLIGHT CREATED EVENT ==========');
+    console.log(eventData);
+
+    this.kafkaClient.emit('flight.created', eventData);
 
     return new DataResponse('Flight created successfully', 200);
   }

@@ -207,11 +207,27 @@ model AircraftModel {
 
   aircraftList Aircraft[]
 
+  layout AircraftLayout?
+
   createdAt DateTime @default(now())
 
   updatedAt DateTime @updatedAt
 
   @@unique([name, manufacturerId])
+}
+
+model AircraftLayout {
+  id String @id @default(uuid())
+
+  aircraftModelId String @unique
+
+  aircraftModel AircraftModel @relation(fields: [aircraftModelId],references: [id],onDelete: Cascade)
+
+  rows Int
+  seatsPerRow Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Aircraft {

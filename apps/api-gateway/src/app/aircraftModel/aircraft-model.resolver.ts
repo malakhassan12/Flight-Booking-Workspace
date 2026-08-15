@@ -45,6 +45,14 @@ export class AircraftModelResolver {
     );
   }
 
+  @ResolveField('aircraftLayout') aircraftLayout(
+    @Parent() aircraftModel: AircraftModel,
+  ) {
+    return this.aircraftModelService.findLayoutByModelId(
+      aircraftModel.id,
+    );
+  }
+
   @Query('aircraftModel')
   getAircraftModel(@Args('id') id: string) {
     return this.aircraftModelService.findOne(id);

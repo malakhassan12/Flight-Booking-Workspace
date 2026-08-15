@@ -82,6 +82,24 @@ export class AircraftModelService {
     });
   }
 
+  async findLayoutByModelId(modelId: string) {
+    const aircraftModel = await this.prisma.aircraftModel.findUnique({
+      where: {
+        id: modelId,
+      },
+    });
+
+    if (!aircraftModel) {
+      throw new RpcHttpException(404, 'Aircraft model not found');
+    }
+
+    return await this.prisma.aircraftLayout.findUnique({
+      where: {
+        aircraftModelId: modelId,
+      },
+    });
+  }
+
   async findAll(page: number, limit: number) {
     const skip = (page - 1) * limit;
 
@@ -99,7 +117,6 @@ export class AircraftModelService {
 
     return new DataResponse<{
       aircraftModels: AircraftModel[];
-
       page: number;
       limit: number;
       totalItems: number;

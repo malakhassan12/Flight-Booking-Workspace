@@ -53,7 +53,6 @@
 #     environment:
 #       PORT: 3002
 
-
 #   adminer:
 #     image: adminer
 #     container_name: adminer
@@ -68,8 +67,6 @@
 # volumes:
 #   postgres_data:
 
-
-
 services:
   postgres:
     image: postgres:17
@@ -82,15 +79,14 @@ services:
       # POSTGRES_DB: user_db
 
     ports:
-      - "5432:5432"
-
+      - '5432:5432'
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -115,9 +111,10 @@ services:
 
     env_file:
       - apps/user-service/.env
+      - .env
 
     expose:
-      - "3001"
+      - '3001'
 
     networks:
       - backend
@@ -134,13 +131,17 @@ services:
     restart: unless-stopped
 
     depends_on:
-      - user-service
+      user-service:
+        condition: service_started
+      consul:
+        condition: service_started
 
     env_file:
       - apps/auth-service/.env
+      - .env
 
     expose:
-      - "3002"
+      - '3002'
 
     networks:
       - backend
@@ -152,7 +153,7 @@ services:
     container_name: broker
 
     ports:
-      - "9092:9092"
+      - '9092:9092'
 
     environment:
       KAFKA_NODE_ID: 1
@@ -185,7 +186,6 @@ services:
   #########################################################
 
   flight-service:
-
     build:
       context: .
       dockerfile: apps/flight-service/Dockerfile
@@ -202,12 +202,14 @@ services:
 
     env_file:
       - apps/flight-service/.env
+      - .env
 
     expose:
-      - "3003"
+      - '3003'
 
     networks:
       - backend
+
   #########################################################
 
   api-gateway:
@@ -225,12 +227,12 @@ services:
       - flight-service
       - broker
 
-
     env_file:
       - apps/api-gateway/.env
+      - .env
 
     ports:
-      - "3000:3000"
+      - '3000:3000'
 
     networks:
       - backend
@@ -249,15 +251,124 @@ services:
         condition: service_healthy
 
     ports:
-      - "8080:8080"
+      - '8080:8080'
 
     networks:
       - backend
 
-#########################################################
+  #########################################################
+
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul
+    restart: always
+
+    volumes:
+      - consul_data:/consul/data
+      - ./consul/config:/consul/config
+
+    ports:
+      - '8500:8500'
+      - '8600:8600/udp'
+      - '8600:8600/tcp'
+
+    command: >
+      agent
+      -server
+      -bootstrap-expect=1
+      -ui
+      -client=0.0.0.0
+      -data-dir=/consul/data
+      -config-dir=/consul/config
+
+    networks:
+      - backend
+
+  #########################################################
+
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    ports:
+      - '8200:8200'
+    volumes:
+      - ./vault-data:/vault/file
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_LOCAL_CONFIG: |
+        {
+          "storage": {
+            "file": {
+              "path": "/vault/file"
+            }
+          },
+          "listener": [
+            {
+              "tcp": {
+                "address": "0.0.0.0:8200",
+                "tls_disable": true
+              }
+            }
+          ],
+          "default_lease_ttl": "168h",
+          "max_lease_ttl": "720h",
+          "ui": true
+        }
+    command: server
+    restart: unless-stopped
+    networks:
+      - backend
+
+  #########################################################
+
+  seat-service:
+    build:
+      context: .
+      dockerfile: apps/seat-service/Dockerfile
+
+    container_name: seat-service
+
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      broker:
+        condition: service_started
+
+    env_file:
+      - apps/seat-service/.env
+      - .env
+
+    expose:
+      - '3004'
+
+    networks:
+      - backend
+
+
+  redis:
+      image: redis:latest
+      container_name: redis
+      ports:
+          - '6379:6379'
+      volumes:
+          - redis-data:/data
+      environment:
+          - REDIS_ARGS=--requirepass ${REDIS_PASSWORD} --appendonly yes
+      networks:
+          - backend
+      restart: unless-stopped
+
 
 volumes:
   postgres_data:
+  consul_data:
+  consul_config:
+  redis-data:
+
+
 
 #########################################################
 

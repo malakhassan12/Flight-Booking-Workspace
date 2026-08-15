@@ -25,6 +25,11 @@ export class AircraftModelController {
     return this.aircraftModelService.findManufacturerByModelId(modelId);
   }
 
+  @MessagePattern('aircraftLayout.findByAircraftModel')
+  findLayoutByModelId(@Payload() modelId: string) {
+    return this.aircraftModelService.findLayoutByModelId(modelId);
+  }
+
   @MessagePattern('aircraftModel.findAll')
   findAll(@Payload() data: { page: number; limit: number }) {
     return this.aircraftModelService.findAll(data.page, data.limit);

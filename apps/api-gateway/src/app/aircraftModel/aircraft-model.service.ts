@@ -25,6 +25,12 @@ export class AircraftModelService {
     );
   }
 
+  async findLayoutByModelId(modelId: string) {
+    return firstValueFrom(
+      this.flightClient.send('aircraftLayout.findByAircraftModel', modelId),
+    );
+  }
+
   async findAll(page = 1, limit = 10) {
     return firstValueFrom(
       this.flightClient.send('aircraftModel.findAll', {

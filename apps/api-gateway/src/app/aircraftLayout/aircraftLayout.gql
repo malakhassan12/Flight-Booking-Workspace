@@ -1,0 +1,63 @@
+type AircraftLayout {
+  id: ID!
+  aircraftModelId: ID!
+  rows: Int!
+  seatsPerRow: Int!
+  aircraftModel: AircraftModel
+}
+
+type AircraftLayoutResponse implements Response {
+  message: String!
+  status: Int!
+  data: AircraftLayout
+}
+
+type AircraftLayoutPagination implements Pagination {
+  aircraftLayouts: [AircraftLayout!]!
+
+  totalItems: Int!
+
+  page: Int!
+
+  limit: Int!
+
+  totalPages: Int!
+}
+
+type AircraftLayoutPaginationResponse implements Response {
+  message: String!
+  status: Int!
+  data: AircraftLayoutPagination
+}
+
+
+
+input CreateAircraftLayoutInput {
+  aircraftModelId: ID!
+  rows: Int!
+  seatsPerRow: Int!
+}
+
+input UpdateAircraftLayoutInput {
+  id: ID!
+  rows: Int
+  seatsPerRow: Int
+}
+
+extend type Query {
+  getAllAircraftLayouts(page: Int = 1, limit: Int = 10): AircraftLayoutPaginationResponse!
+
+  getAircraftLayout(id: ID!): AircraftLayoutResponse!
+}
+
+extend type Mutation {
+  createAircraftLayout(
+    input: CreateAircraftLayoutInput!
+  ): AircraftLayoutResponse!
+
+  updateAircraftLayout(
+    input: UpdateAircraftLayoutInput!
+  ): AircraftLayoutResponse!
+
+  removeAircraftLayout(id: ID!): AircraftLayoutResponse!
+}

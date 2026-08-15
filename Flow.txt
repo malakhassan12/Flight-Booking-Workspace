@@ -5,3 +5,136 @@
 3 - Make Auth Service which it the root for all things
 docker compose run --rm --entrypoint sh flight-service
 4 - Make the API gateway
+
+
+
+
+( ============================ Booking Service ============================)
+
+- Create Booking ---> With Passenger Info.
+                    ┌──────────────────┐
+                    │  Booking Service │
+                    │    Orchestrator  │
+                    └────────┬─────────┘
+                             │
+                    1. Validate Flight
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  Flight Service │
+                    └─────────────────┘
+                             │
+                             ▼
+                    2. Lock Seat
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   Seat Service  │
+                    └─────────────────┘
+                             │
+                             ▼
+                    3. Validate Price
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ Pricing Service │
+                    └─────────────────┘
+                             │
+                             ▼
+                    4. Make Payment
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ Payment Service │
+                    └─────────────────┘
+                             │
+                          SUCCESS
+                             │
+                             ▼
+                    5. Confirm Seat
+                             │
+                             ▼
+                    6. Confirm Booking
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ Ticket Service  │
+                    └─────────────────┘
+                    (Generate Ticket --> like QR)
+                             │
+                             ▼
+                    Booking CONFIRMED
+
+
+
+- Update Booking --->
+                    - Update the Passenger Info
+                    - The Seat number (Seat Service).
+                    - Baggage(Baggage Service)
+
+
+
+-  Cancel Booking --->
+
+                    1. User owns booking
+                    2. Booking exists
+                    3. Booking is CONFIRMED
+                    4. Flight hasn't departed (Flight Service)
+                    5. Cancellation is allowed (Pricing Service)
+                    6. Calculate cancellation fee (Pricing Service)
+                    7. Ticket Expired (Ticket Service)
+                    8. Refund through Payment Service (Payment Service)
+                    9. Release seat through Seat Service (Seat Service)
+                    10. Update Booking → CANCELLED
+                    11. Publish booking.cancelled event
+
+
+-  Get Mu All bookings
+-  Get One Booking By ID.
+
+
+// ---------------------------------- Priorty !!!
+      Flight Service
+            ↓
+      Seat Service            ← ابدأ هنا
+            ↓
+      Pricing Service <<<< Tomorrow
+            ↓
+      Payment Service
+            ↓
+      Ticket Service
+            ↓
+      Baggage Service
+            ↓
+      Booking Service         ← Orchestrator
+            ↓
+      Check-in Service
+
+
+
+
+
+
+*** Connect with api-gateway and use redis
+
+Seat Service
+*************
+| #  | API / Command                  | Type          | Input                                          | Output / Purpose                               | Used By                |
+| -- | ------------------------------ | ------------- | ---------------------------------------------- | ---------------------------------------------- | ---------------------- |
+| 1  | `GET /flights/:flightId/seats` | Query         | `flightId`                                     | كل المقاعد + `seatNumber` + `class` + `status` | API Gateway / Frontend |
+| 2  | `seat.checkAvailability`       | Query         | `flightId`, `seatId`                           | `{ available: true/false }`                    | Booking Service        |
+| 3  | `seat.getStatus`               | Query         | `flightId`, `seatId`                           | Seat status                                    | Booking / API Gateway  |
+| 4  | `seat.getAvailable`            | Query         | `flightId`                                     | `{ availableSeats: 42 }`                       | Flight/Search          |
+| 5  | `seat.lock` ⭐                  | Command       | `flightId`, `seatId`, `bookingId`, `expiresIn` | `LOCKED` + `lockId` + `expiresAt`              | **Booking Service**    |
+| 6  | `seat.confirm` ⭐               | Command       | `flightId`, `seatId`, `bookingId`, `lockId`    | `BOOKED`                                       | **Booking Service**    |
+| 7  | `seat.release` ⭐               | Command       | `flightId`, `seatId`, `bookingId`, `lockId`    | `AVAILABLE`                                    | **Booking Service**    |
+| 8  | `seat.releaseAll` ⭐            | Command       | `bookingId`                                    | Release all seats belonging to booking         | **Booking Service**    |
+| 9  | `seat.getBookingSeats`         | Query         | `bookingId`                                    | All seats belonging to booking                 | Booking Service        |
+| 10 | `seat.getFlightSeatStats`      | Query         | `flightId`                                     | Total / available / locked / booked counts     | Flight/Search/Admin    |
+| 13 | `seat.disable`                 | Command/Admin | `seatId`, reason                               | Seat becomes unavailable                       | Admin                  |
+| 14 | `seat.enable`                  | Command/Admin | `seatId`                                       | Seat becomes available again                   | Admin                  |
+
+
+
+Caching
+

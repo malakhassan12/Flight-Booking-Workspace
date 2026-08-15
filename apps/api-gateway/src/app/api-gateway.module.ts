@@ -22,10 +22,14 @@ import { AircraftModule } from './aircraft/aircraft.module';
 import { ManufacturerModule } from './manufacturer/manufacturer.module';
 import { AircraftModelModule } from './aircraftModel/aircraft-model.module';
 import { FlightModule } from './flight/flight.module';
+import { ConsulModule } from '@flight-booking-workspace/consul';
+import { SeatModule } from './seat/seat.module';
+import { AircraftLayoutModule } from './aircraftLayout/aircraft-layout.module';
 
 @Module({
   imports: [
     SecurityModule,
+    ConsulModule,
     CoreModule,
     CommonModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -110,7 +114,11 @@ import { FlightModule } from './flight/flight.module';
 
     AircraftModelModule,
 
+    AircraftLayoutModule,
+
     FlightModule,
+
+    SeatModule,
   ],
   controllers: [APIGatewayController],
   providers: [

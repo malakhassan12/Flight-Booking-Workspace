@@ -1,0 +1,59 @@
+type Seat {
+  id: ID!
+  flightId: ID!
+  seatNumber: String!
+  class: SeatClass!
+  status: SeatStatus!
+  isActive: Boolean!
+  bookingId: ID
+  lockId: ID
+  lockedUntil: DateTime
+}
+
+type SeatsData {
+  seats: [Seat!]!
+  numberOfSeats: Int!
+}
+
+type SeatsResponse implements Response {
+  message: String!
+  status: Int!
+  data: SeatsData
+}
+
+type SeatResponse implements Response {
+  message: String!
+  status: Int!
+  data: Seat
+}
+
+input SeatRequestInput {
+  flightId: ID!
+  seatId: ID!
+}
+
+input UpdateSeatInput {
+  id: ID!
+  flightId: ID
+  seatNumber: String
+  class: SeatClass
+}
+
+
+extend type Query {
+  getAllSeatsByFlight(flightId: ID!): SeatsResponse!
+
+  getAvailableSeats(flightId: ID!): SeatsResponse!
+
+  getBookingSeats(bookingId: ID!): SeatsResponse!
+}
+
+extend type Mutation {
+  updateSeat(input: UpdateSeatInput!): SeatResponse!
+
+  removeSeat(id: ID!): SeatResponse!
+
+  disableSeat(id: ID!): SeatResponse!
+
+  enableSeat(id: ID!): SeatResponse!
+}

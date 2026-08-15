@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, firstValueFrom, lastValueFrom, throwError } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
@@ -15,15 +15,42 @@ import {
   SignUpDto,
   ResetPasswordDto,
 } from '@flight-booking-workspace/security';
+import { ConsulService } from '@flight-booking-workspace/consul';
+import { VaultService } from '@flight-booking-workspace/vault';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
   constructor(
     @Inject('USER_SERVICE')
     private readonly userClient: ClientProxy,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly consulService: ConsulService,
+    private readonly vaultService: VaultService,
   ) {}
+
+  async onModuleInit() {
+    // await this.consulService.registerService({
+    //   id: 'auth-service-1',
+    //   name: 'auth-service',
+    //   port: 3002,
+    //   address: 'auth-service',
+    //   tags: ['production', 'secure'],
+    //   check: {
+    //     id: 'auth-check',
+    //     name: 'Auth Service TCP Check',
+    //     tcp: 'auth-service:3002',
+    //     interval: '10s',
+    //     timeout: '1s',
+    //   },
+    // });
+
+    await this.consulService.createIntention(
+      'auth-service',
+      'user-service',
+      'allow',
+    );
+  }
 
   async signUp(data: SignUpDto) {
     try {
@@ -159,13 +186,27 @@ export class AuthService {
         role: user.role,
       };
 
+      // const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } =
+      //   await this.vaultService.getSecret('auth-service');
+
+      const secrets = await this.vaultService.getSecret('auth-service');
+
+      console.log('Vault secret keys:', Object.keys(secrets));
+
+      const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = secrets;
+
+      console.log('JWT_ACCESS_SECRET exists:', !!JWT_ACCESS_SECRET);
+      console.log('JWT_REFRESH_SECRET exists:', !!JWT_REFRESH_SECRET);
+      
       const accessToken = await this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        // secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        secret: JWT_ACCESS_SECRET,
         expiresIn: '1d',
       });
 
       const refreshToken = await this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        // secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        secret: JWT_REFRESH_SECRET,
         expiresIn: '30d',
       });
 
@@ -183,8 +224,12 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     try {
+      const { JWT_REFRESH_SECRET } =
+        await this.vaultService.getSecret('auth-service');
+
       const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        // secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        secret: JWT_REFRESH_SECRET,
       });
       const user = await firstValueFrom(
         this.userClient

@@ -21,7 +21,6 @@ import { GraphqlExceptionFilter } from '../../filter/graphql-filter';
 
 @Resolver('Manufacturer')
 @UseFilters(GraphqlExceptionFilter)
-
 export class ManufacturerResolver {
   constructor(private readonly manufacturerService: ManufacturerService) {}
 
@@ -42,15 +41,12 @@ export class ManufacturerResolver {
     );
   }
 
-   @ResolveField('country')
+  @ResolveField('country')
   country(@Parent() manufacturer: Manufacturer) {
     return this.manufacturerService.findCountryByManufacturerId(
       manufacturer.id,
     );
   }
-
-
-
 
   @ResolveField('aircraftModels')
   aircraftModels(@Parent() manufacturer: Manufacturer) {

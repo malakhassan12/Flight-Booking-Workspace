@@ -1,0 +1,74 @@
+{
+  "services": [
+    {
+      "id": "broker-1",
+      "name": "broker",
+      "address": "broker",
+      "port": 9092,
+      "tags": ["messaging", "kafka"],
+      "check": {
+        "id": "broker-check",
+        "name": "Kafka Broker TCP Check",
+        "tcp": "broker:9092",
+        "interval": "10s",
+        "timeout": "2s"
+      }
+    },
+    {
+      "id": "flight-service-1",
+      "name": "flight-service",
+      "port": 3003,
+      "address": "flight-service",
+      "tags": ["production", "api"],
+      "check": {
+        "id": "flight-check",
+        "name": "Flight Service TCP Check",
+        "tcp": "flight-service:3003",
+        "interval": "10s",
+        "timeout": "1s"
+      }
+    },
+    {
+      "id": "user-service-1",
+      "name": "user-service",
+      "port": 3001,
+      "address": "user-service",
+      "tags": ["production", "api"],
+      "check": {
+        "id": "user-check",
+        "name": "User Service TCP Check",
+        "tcp": "user-service:3001",
+        "interval": "10s",
+        "timeout": "1s"
+      }
+    },
+    {
+      "id": "auth-service-1",
+      "name": "auth-service",
+      "port": 3002,
+      "address": "auth-service",
+      "tags": ["production", "secure"],
+      "check": {
+        "id": "auth-check",
+        "name": "Auth Service TCP Check",
+        "tcp": "auth-service:3002",
+        "interval": "10s",
+        "timeout": "1s"
+      }
+    },
+    {
+      "id": "seat-service-1",
+      "name": "seat-service",
+      "port": 3004,
+      "address": "seat-service",
+      "tags": ["production", "secure"],
+      "check": {
+        "id": "seat-check",
+        "name": "Seat Service TCP Check",
+        "tcp": "seat-service:3004",
+        "interval": "10s",
+        "timeout": "1s"
+      }
+    }
+  ]
+}

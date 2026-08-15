@@ -26,6 +26,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/consul/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/security/tsconfig.lib.json"
     },
     {
@@ -33,6 +36,9 @@
     },
     {
       "path": "../../libs/common/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vault/tsconfig.lib.json"
     }
   ]
 }

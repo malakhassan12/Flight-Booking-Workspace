@@ -3,6 +3,13 @@
 // npm install --save-dev prisma dotenv
 import 'dotenv/config';
 import { defineConfig } from 'prisma/config';
+import { VaultService } from '@flight-booking-workspace/vault';
+
+
+const vaultService = new VaultService();
+
+const secrets =
+  await vaultService.getSecret('flight-service');
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
@@ -12,6 +19,7 @@ export default defineConfig({
     seed: 'npx tsx prisma/seed.cities.ts',
   },
   datasource: {
-    url: process.env['DATABASE_URL'],
+    // url: process.env['DATABASE_URL'],
+    url : secrets.DATABASE_URL
   },
 });

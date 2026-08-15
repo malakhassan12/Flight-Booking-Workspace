@@ -40,7 +40,19 @@ export class ClientGatewayService implements OnModuleInit {
       'aircraftModel.update',
       'aircraftModel.remove',
       'aircraftList.findByModel',
+      'aircraftLayout.findByAircraftModel', // <----
       'manufacturer.findByAircraftModel',
+
+      // new
+
+      'aircraftLayout.create',
+      'aircraftLayout.findAll',
+      'aircraftLayout.findOne',
+      'aircraftModel.findByAircraftLayout',
+      'aircraftLayout.update',
+      'aircraftLayout.remove',
+
+      // ----
 
       'aircraft.findAll',
       'aircraft.findOne',
@@ -61,7 +73,6 @@ export class ClientGatewayService implements OnModuleInit {
       'aircraft.findByFlight',
       'airport.findOriginByFlight',
       'airport.findDestinationByFlight',
-
     ];
 
     for (const pattern of patterns) {
